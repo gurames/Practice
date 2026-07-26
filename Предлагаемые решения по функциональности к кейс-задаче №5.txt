@@ -1,0 +1,10 @@
+// Дополнительная валидация перед вставкой
+function ValidateTourDates(ClientID: Integer; StartDate, EndDate: TDate): string;
+begin
+  // Проверка пересечения дат
+  qryCheck.SQL.Text := 
+    'SELECT COUNT(*) FROM Orders WHERE ClientID = :ClientID ' +
+    'AND Status NOT IN ("отменен", "завершен") ' +
+    'AND ((TourStartDate <= :EndDate) AND (TourEndDate >= :StartDate))';
+  // ... проверка и возврат сообщения об ошибке
+end;

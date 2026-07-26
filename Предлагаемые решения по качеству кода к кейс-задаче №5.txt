@@ -1,0 +1,23 @@
+// 1. Использование констант
+const
+  ORDER_STATUS_NEW = 'новый';
+  ORDER_STATUS_CONFIRMED = 'подтвержден';
+  ORDER_STATUS_CANCELLED = 'отменен';
+
+// 2. Вынос SQL-запросов в ресурсы
+const
+  SQL_GET_ORDERS = 
+    'SELECT o.OrderID, c.LastName + '' '' + c.FirstName AS ClientName, ' +
+    'd.Country + '', '' + d.City AS Destination, o.TourStartDate, ' +
+    'o.Status, o.FinalPrice ' +
+    'FROM Orders o ' +
+    'JOIN Clients c ON o.ClientID = c.ClientID ' +
+    'JOIN Destinations d ON o.DestinationID = d.DestinationID ' +
+    'ORDER BY o.OrderDate DESC';
+
+// 3. Использование паттерна Repository
+type
+  IOrderRepository = interface
+    function GetOrders: TArray<TOrder>;
+    function CreateOrder(Order: TOrder): Integer;
+  end;

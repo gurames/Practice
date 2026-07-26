@@ -1,0 +1,23 @@
+// 1. Внедрение Dependency Injection
+type
+  IDatabaseProvider = interface
+    function GetOrders: TDataSet;
+    procedure SaveOrder(OrderData: TOrder);
+  end;
+
+  TMSSQLProvider = class(TInterfacedObject, IDatabaseProvider)
+    // Реализация для MS SQL
+  end;
+
+  TPostgreSQLProvider = class(TInterfacedObject, IDatabaseProvider)
+    // Реализация для PostgreSQL
+  end;
+
+// 2. XML-документация
+/// <summary>
+/// Возвращает HTML-представление списка заказов
+/// </summary>
+/// <returns>
+/// Строка с HTML-кодом для отображения заказов
+/// </returns>
+function GetOrdersHTML: string;

@@ -1,0 +1,39 @@
+// 1. Unit-тесты с DUnit или DUnitX
+unit TestOrders;
+
+interface
+uses
+  TestFramework, System.SysUtils;
+
+type
+  TestTOrderService = class(TTestCase)
+  published
+    procedure TestCreateOrder;
+    procedure TestValidateDates;
+    procedure TestNegativePrice;
+  end;
+
+implementation
+
+procedure TestTOrderService.TestCreateOrder;
+begin
+  // Тест создания заказа
+end;
+
+// 2. Автоматизация тестирования через Postman
+// Collection: Tourism API Tests
+// - GET /orders
+// - POST /orders
+// - Проверка статусов ответа
+
+// 3. Нагрузочное тестирование
+procedure RunLoadTest;
+var
+  i: Integer;
+  Threads: TArray<TThread>;
+begin
+  for i := 1 to 1000 do
+  begin
+    // Создание заказов в разных потоках
+  end;
+end;

@@ -1,0 +1,45 @@
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│   clients   │      │destinations │      │  employees  │
+├─────────────┤      ├─────────────┤      ├─────────────┤
+│ client_id   │◄─────│destin_id(PK)│      │ employee_id │
+│ last_name   │      │ country     │      │ last_name   │
+│ first_name  │      │ city        │      │ first_name  │
+│ passport(UN)│      │ hotel_name  │      │ position    │
+│ phone       │      │ hotel_stars │      │ phone       │
+│ email       │      │ description │      │ hire_date   │
+└─────────────┘      └──────┬──────┘      └──────┬───────┘
+                             │                    │
+                             │                    │
+                             ▼                    ▼
+                      ┌──────────────────────────────┐
+                      │           orders             │
+                      ├──────────────────────────────┤
+                      │ order_id (PK)                │
+                      │ client_id (FK) ──────────────┼──┐
+                      │ destination_id (FK) ─────────┼──┼──┐
+                      │ employee_id (FK) ────────────┼──┼──┼──┐
+                      │ service_id (FK) ─────────────┼──┼──┼──┼──┐
+                      │ tour_start_date              │  │  │  │  │
+                      │ tour_end_date                │  │  │  │  │
+                      │ number_of_travelers          │  │  │  │  │
+                      │ total_price                  │  │  │  │  │
+                      │ discount_percent             │  │  │  │  │
+                      │ final_price (GENERATED)      │  │  │  │  │
+                      │ status                       │  │  │  │  │
+                      │ payment_status               │  │  │  │  │
+                      └──────────────────────────────┘  │  │  │  │
+                                                       │  │  │  │
+              ┌────────────────────────────────────────┘  │  │  │
+              │  ┌───────────────────────────────────────┘  │  │
+              │  │  ┌─────────────────────────────────────┘  │
+              │  │  │  ┌────────────────────────────────────┘
+              ▼  ▼  ▼  ▼
+         ┌────────────┐
+         │  services  │
+         ├────────────┤
+         │service_id  │
+         │service_name│
+         │service_type│
+         │price       │
+         │description │
+         └────────────┘

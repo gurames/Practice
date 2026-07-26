@@ -1,0 +1,26 @@
+// 1. Использование FireDAC вместо ADO
+uses
+  FireDAC.Comp.Client, FireDAC.Phys.SQLite, FireDAC.Phys.MSSQL;
+
+// 2. Использование TIdHTTPWebBrokerBridge для автономного запуска
+uses
+  IdHTTPWebBrokerBridge;
+
+procedure StartStandaloneServer;
+var
+  Server: TIdHTTPWebBrokerBridge;
+begin
+  Server := TIdHTTPWebBrokerBridge.Create(nil);
+  try
+    Server.DefaultPort := 8080;
+    Server.RegisterWebModule(TWebModuleMain);
+    Server.Active := True;
+  except
+    // Обработка ошибок
+  end;
+end;
+
+// 3. Docker-контейнеризация
+// Dockerfile
+FROM mcr.microsoft.com/dotnet/framework/aspnet:4.8
+COPY . /inetpub/wwwroot/TourismWeb

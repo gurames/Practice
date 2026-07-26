@@ -1,0 +1,104 @@
+// DataModuleDB.pas
+unit DataModuleDB;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, Data.DB, Data.Win.ADODB;
+
+type
+  TdmDB = class(TDataModule)
+    ADOConnection: TADOConnection;
+    qryOrders: TADOQuery;
+    qryClients: TADOQuery;
+    qryDestinations: TADOQuery;
+    qryServices: TADOQuery;
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    procedure ConnectToDB;
+  public
+    function GetOrdersHTML: string;
+    function GetOrderFormHTML: string;
+  end;
+
+var
+  dmDB: TdmDB;
+
+implementation
+
+{%CLASSGROUP 'System.Classes.TPersistent'}
+
+{$R *.dfm}
+
+procedure TdmDB.DataModuleCreate(Sender: TObject);
+begin
+  ConnectToDB;
+end;
+
+procedure TdmDB.ConnectToDB;
+begin
+  with ADOConnection do
+  begin
+    ConnectionString := 'Provider=SQLOLEDB;' +
+                        'Data Source=localhost;' +
+                        'Initial Catalog=TourismWebDB;' +
+                        'Integrated Security=SSPI;';
+    LoginPrompt := False;
+    Connected := True;
+  end;
+  
+  qryOrders.Connection := ADOConnection;
+  qryClients.Connection := ADOConnection;
+  qryDestinations.Connection := ADOConnection;
+  qryServices.Connection := ADOConnection;
+end;
+
+function TdmDB.GetOrdersHTML: string;
+var
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  try
+    sb.Append('<html><head><title>Заказы туров</title>');
+    sb.Append('<style>table {border-collapse:collapse;width:100%;}');
+    sb.Append('th,td {border:1px solid #ddd;padding:8px;text-align:left;}');
+    sb.Append('th {background-color:#4CAF50;color:white;}</style></head><body>');
+    sb.Append('<h1>Список заказов</h1>');
+    sb.Append('<table><tr><th>ID</th><th>Клиент</th><th>Направление</th>');
+    sb.Append('<th>Дата начала</th><th>Статус</th><th>Сумма</th></tr>');
+    
+    qryOrders.SQL.Text := 
+      'SELECT o.OrderID, c.LastName + '' '' + c.FirstName AS ClientName, ' +
+      'd.Country + '', '' + d.City AS Destination, o.TourStartDate, ' +
+      'o.Status, o.FinalPrice ' +
+      'FROM Orders o ' +
+      'JOIN Clients c ON o.ClientID = c.ClientID ' +
+      'JOIN Destinations d ON o.DestinationID = d.DestinationID ' +
+      'ORDER BY o.OrderDate DESC';
+    qryOrders.Open;
+    
+    while not qryOrders.Eof do
+    begin
+      sb.Append('<tr>');
+      sb.Append('<td>').Append(qryOrders.FieldByName('OrderID').AsString).Append('</td>');
+      sb.Append('<td>').Append(qryOrders.FieldByName('ClientName').AsString).Append('</td>');
+      sb.Append('<td>').Append(qryOrders.FieldByName('Destination').AsString).Append('</td>');
+      sb.Append('<td>').Append(DateToStr(qryOrders.FieldByName('TourStartDate').AsDateTime)).Append('</td>');
+      sb.Append('<td>').Append(qryOrders.FieldByName('Status').AsString).Append('</td>');
+      sb.Append('<td>').Append(FormatFloat('0.00', qryOrders.FieldByName('FinalPrice').AsFloat)).Append('</td>');
+      sb.Append('</tr>');
+      qryOrders.Next;
+    end;
+    qryOrders.Close;
+    
+    sb.Append('</table><br>');
+    sb.Append('<a href="/TourismWeb/TourismWeb.dll?action=form">Создать новый заказ</a>');
+    sb.Append('</body></html>');
+    
+    Result := sb.ToString;
+  finally
+    sb.Free;
+  end;
+end;
+
+end.

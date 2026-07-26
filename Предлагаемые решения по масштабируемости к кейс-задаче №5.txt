@@ -1,0 +1,18 @@
+// 1. Внедрение REST API через DataSnap
+type
+  TOrdersAPI = class
+  public
+    function GetOrders: TJSONArray;
+    function CreateOrder(OrderData: TJSONObject): TJSONObject;
+  end;
+
+// 2. Использование кеширования через Redis
+function GetCachedData(const Key: string): string;
+begin
+  Result := FRedis.Get(Key);
+end;
+
+// 3. Переход на микросервисную архитектуру
+// - Сервис заказов (Orders Service)
+// - Сервис клиентов (Clients Service)  
+// - Сервис направлений (Destinations Service)

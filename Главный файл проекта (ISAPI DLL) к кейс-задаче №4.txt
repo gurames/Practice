@@ -1,0 +1,22 @@
+// TourismWeb.dpr
+library TourismWeb;
+
+uses
+  System.SysUtils,
+  System.Classes,
+  Web.HTTPApp,
+  WebModuleMain in 'WebModuleMain.pas' {WebModuleMain: TWebModule},
+  DataModuleDB in 'DataModuleDB.pas' {dmDB: TDataModule};
+
+{$R *.res}
+
+exports
+  GetExtensionVersion,
+  HttpExtensionProc,
+  TerminateExtension;
+
+begin
+  Application.Initialize;
+  Application.WebModuleClass := WebModuleClass;
+  Application.Run;
+end.

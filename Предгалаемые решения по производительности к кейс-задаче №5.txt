@@ -1,0 +1,23 @@
+// 1. Использование пула соединений
+procedure TdmDB.GetConnection: TADOConnection;
+begin
+  if not Assigned(FConnectionPool) then
+    FConnectionPool := TConnectionPool.Create;
+  Result := FConnectionPool.GetConnection;
+end;
+
+// 2. Кеширование справочников в TDictionary
+procedure TdmDB.CacheDestinations;
+begin
+  if FDestinationsCache = nil then
+  begin
+    FDestinationsCache := TDictionary<Integer, string>.Create;
+    qryDestinations.Open;
+    while not qryDestinations.Eof do
+    begin
+      FDestinationsCache.Add(qryDestinations.FieldByName('DestinationID').AsInteger,
+                             qryDestinations.FieldByName('Country').AsString);
+      qryDestinations.Next;
+    end;
+  end;
+end;

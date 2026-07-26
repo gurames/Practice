@@ -1,0 +1,140 @@
+// WebModuleMain.pas
+unit WebModuleMain;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, Web.HTTPApp, Data.DB,
+  Data.Win.ADODB, DataModuleDB;
+
+type
+  TWebModuleMain = class(TWebModule)
+    procedure WebModuleMainDefaultAction(Sender: TObject;
+      Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure WebModuleMainOrdersAction(Sender: TObject;
+      Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure WebModuleMainCreateAction(Sender: TObject;
+      Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+  private
+    function GenerateMainPage: string;
+    function GenerateErrorPage(const Msg: string): string;
+  public
+    { Public declarations }
+  end;
+
+var
+  WebModuleClass: TComponentClass = TWebModuleMain;
+
+implementation
+
+{%CLASSGROUP 'System.Classes.TPersistent'}
+
+{$R *.dfm}
+
+procedure TWebModuleMain.WebModuleMainDefaultAction(Sender: TObject;
+  Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+begin
+  Response.Content := GenerateMainPage;
+  Response.ContentType := 'text/html';
+  Handled := True;
+end;
+
+procedure TWebModuleMain.WebModuleMainOrdersAction(Sender: TObject;
+  Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+var
+  dm: TdmDB;
+begin
+  try
+    dm := TdmDB.Create(nil);
+    try
+      Response.Content := dm.GetOrdersHTML;
+      Response.ContentType := 'text/html';
+    finally
+      dm.Free;
+    end;
+  except
+    on E: Exception do
+      Response.Content := GenerateErrorPage(E.Message);
+  end;
+  Handled := True;
+end;
+
+procedure TWebModuleMain.WebModuleMainCreateAction(Sender: TObject;
+  Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+var
+  ClientID, DestID, ServiceID: Integer;
+  StartDate, EndDate: TDate;
+  Travelers: Integer;
+  TotalPrice: Double;
+begin
+  if Request.MethodType = 'POST' then
+  begin
+    // Обработка отправки формы
+    try
+      ClientID := StrToInt(Request.ContentFields.Values['ClientID']);
+      DestID := StrToInt(Request.ContentFields.Values['DestID']);
+      ServiceID := StrToInt(Request.ContentFields.Values['ServiceID']);
+      StartDate := StrToDate(Request.ContentFields.Values['StartDate']);
+      EndDate := StrToDate(Request.ContentFields.Values['EndDate']);
+      Travelers := StrToInt(Request.ContentFields.Values['Travelers']);
+      TotalPrice := StrToFloat(Request.ContentFields.Values['TotalPrice']);
+
+      with TdmDB.Create(nil) do
+      try
+        ADOConnection.Connected := True;
+        qryOrders.SQL.Text := 
+          'INSERT INTO Orders (ClientID, DestinationID, ServiceID, ' +
+          'TourStartDate, TourEndDate, TravelersCount, TotalPrice, Status) ' +
+          'VALUES (:ClientID, :DestID, :ServiceID, :StartDate, :EndDate, ' +
+          ':Travelers, :Price, ''новый'')';
+        qryOrders.Parameters.ParamByName('ClientID').Value := ClientID;
+        qryOrders.Parameters.ParamByName('DestID').Value := DestID;
+        qryOrders.Parameters.ParamByName('ServiceID').Value := ServiceID;
+        qryOrders.Parameters.ParamByName('StartDate').Value := StartDate;
+        qryOrders.Parameters.ParamByName('EndDate').Value := EndDate;
+        qryOrders.Parameters.ParamByName('Travelers').Value := Travelers;
+        qryOrders.Parameters.ParamByName('Price').Value := TotalPrice;
+        qryOrders.ExecSQL;
+        
+        Response.Content := '<html><body><h1>Заказ создан!</h1>' +
+                            '<a href="/TourismWeb/TourismWeb.dll?action=orders">Вернуться к списку</a>' +
+                            '</body></html>';
+      finally
+        Free;
+      end;
+      Handled := True;
+      Exit;
+    except
+      on E: Exception do
+        Response.Content := GenerateErrorPage('Ошибка: ' + E.Message);
+    end;
+    Handled := True;
+    Exit;
+  end;
+
+  // GET-запрос — показать форму
+  Response.Content := GenerateOrderForm;
+  Response.ContentType := 'text/html';
+  Handled := True;
+end;
+
+function TWebModuleMain.GenerateMainPage: string;
+begin
+  Result := 
+    '<html><head><title>Туристическая система</title>' +
+    '<style>body {font-family:Arial;margin:40px;} ' +
+    'a {display:inline-block;padding:10px 20px;background:#4CAF50;color:white;' +
+    'text-decoration:none;border-radius:4px;}</style></head><body>' +
+    '<h1>Добро пожаловать в систему управления турами!</h1>' +
+    '<p><a href="/TourismWeb/TourismWeb.dll?action=orders">Просмотреть заказы</a></p>' +
+    '<p><a href="/TourismWeb/TourismWeb.dll?action=form">Создать новый заказ</a></p>' +
+    '</body></html>';
+end;
+
+function TWebModuleMain.GenerateErrorPage(const Msg: string): string;
+begin
+  Result := '<html><body><h1>Ошибка</h1><p>' + Msg + '</p>' +
+            '<a href="/TourismWeb/TourismWeb.dll">На главную</a></body></html>';
+end;
+
+end.

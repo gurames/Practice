@@ -1,0 +1,1 @@
+qryOrders.SQL.Text := 'SELECT ... JOIN ... WHERE ...';
