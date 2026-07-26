@@ -1,0 +1,36 @@
+<!-- Использование шаблонов Handlebars или Mustache -->
+<!-- HTML шаблон в отдельном файле -->
+<script id="orders-template" type="text/x-handlebars-template">
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Клиент</th>
+      <th>Направление</th>
+      <th>Дата начала</th>
+      <th>Статус</th>
+      <th>Сумма</th>
+    </tr>
+    {{#each orders}}
+    <tr>
+      <td>{{OrderID}}</td>
+      <td>{{ClientName}}</td>
+      <td>{{Destination}}</td>
+      <td>{{TourStartDate}}</td>
+      <td>{{Status}}</td>
+      <td>{{FinalPrice}}</td>
+    </tr>
+    {{/each}}
+  </table>
+</script>
+
+<!-- Валидация на клиенте -->
+<script>
+document.getElementById('orderForm').addEventListener('submit', function(e) {
+  var startDate = new Date(document.getElementById('StartDate').value);
+  var endDate = new Date(document.getElementById('EndDate').value);
+  if (startDate >= endDate) {
+    alert('Дата окончания должна быть позже даты начала');
+    e.preventDefault();
+  }
+});
+</script>
