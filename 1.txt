@@ -1,0 +1,14 @@
+TourismWebApp/
+├── Source/
+│   ├── TourismWeb.dpr          # Главный проект (ISAPI DLL)
+│   ├── WebModuleMain.pas       # Основной WebModule
+│   ├── DataModuleDB.pas        # Подключение к MS SQL
+│   ├── HTML Templates/
+│   │   ├── main.html           # Главная страница
+│   │   ├── orders.html         # Список заказов
+│   │   └── order_form.html     # Форма создания заказа
+│   └── UnitHelpers.pas         # Вспомогательные функции
+├── Database/
+│   └── TourismDB.sql           # Скрипт создания БД
+└── Deployment/
+    └── IIS_Setup.md            # Инструкция по развертыванию
